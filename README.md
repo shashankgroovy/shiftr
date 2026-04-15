@@ -14,9 +14,9 @@ Works with the **legacy profile system** (`about:profiles`), **not** the newer `
 ## Screenshots
 
 <p align="center">
-  <img src="images/FFX_PS Dark.png" alt="Shiftr dark theme" width="270" />
+  <img src="images/shiftr-dark.png" alt="Shiftr dark theme" width="270" />
   &nbsp;&nbsp;
-  <img src="images/FFX_PS Light.png" alt="Shiftr light theme" width="270" />
+  <img src="images/shiftr-light.png" alt="Shiftr light theme" width="270" />
 </p>
 
 ## Features
