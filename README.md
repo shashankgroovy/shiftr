@@ -42,14 +42,37 @@ Firefox extensions can't read the filesystem directly, so Shiftr uses Firefox's 
 
 ## Installation
 
-### Step 1: Clone the repository
+### Quick install (recommended)
+
+1. Install Shiftr from [addons.mozilla.org](https://addons.mozilla.org/en-GB/firefox/addon/shiftr/)
+2. Click the Shiftr icon in the toolbar. The first time, it shows a one-time setup screen — click **Copy command**
+3. Paste the command into a terminal and run it:
+
+   ```bash
+   curl -fsSL https://raw.githubusercontent.com/shashankgroovy/shiftr/v1.1.0/install.sh | bash
+   ```
+
+   The popup always shows the command for the version you have installed.
+
+4. Open the Shiftr popup again — your profiles are listed
+
+Firefox doesn't allow extensions to run scripts or write files outside the browser, which is why the native messaging host has to be installed from a terminal. The command downloads `shiftr_host.py` to a per-user directory and registers it with Firefox:
+
+- **macOS:** `~/Library/Application Support/Shiftr/`
+- **Linux:** `~/.local/share/shiftr/`
+
+To remove it again, run `uninstall.sh` from this repository.
+
+### Install from source
+
+#### Step 1: Clone the repository
 
 ```bash
 git clone <repo-url> shiftr
 cd shiftr
 ```
 
-### Step 2: Install the native messaging host
+#### Step 2: Install the native messaging host
 
 ```bash
 ./install.sh
@@ -63,7 +86,7 @@ This does two things:
 
 The manifest tells Firefox where to find the Python script and which extension is allowed to use it.
 
-### Step 3: Load the extension in Firefox
+#### Step 3: Load the extension in Firefox
 
 Since this is an unsigned extension, load it as a temporary add-on:
 
@@ -76,7 +99,7 @@ The Shiftr icon (swap arrows) will appear in your toolbar.
 
 > **Note:** Temporary add-ons are removed when Firefox restarts. You'll need to reload it each time. See [Permanent Installation](#permanent-installation) below to avoid this.
 
-### Step 4: Verify it works
+#### Step 4: Verify it works
 
 1. Click the Shiftr icon in the toolbar — you should see your profiles listed
 2. Click a profile name to launch Firefox with that profile
@@ -122,7 +145,7 @@ cd extension
 npx web-ext build
 ```
 
-The output will be at `extension/web-ext-artifacts/shiftr-1.0.0.zip`.
+The output will be at `extension/web-ext-artifacts/shiftr-1.1.0.zip`.
 
 To lint the extension for AMO compliance:
 
@@ -155,7 +178,7 @@ npx web-ext sign --api-key=YOUR_KEY --api-secret=YOUR_SECRET
 
 Or submit to [addons.mozilla.org](https://addons.mozilla.org) for public distribution.
 
-> **Note:** Even with a signed extension, you still need to run `./install.sh` on each machine to register the native messaging host.
+> **Note:** Even with a signed extension, the native messaging host still has to be registered on each machine. The popup shows the one-line install command when the host is missing (see [Quick install](#quick-install-recommended)).
 
 ## Customising the keyboard shortcut
 
@@ -169,7 +192,7 @@ If `Alt+Shift+P` conflicts with another extension or tool, you can change it in 
 
 ### "Cannot connect to native host" error
 
-- Make sure you ran `./install.sh` first
+- Make sure you ran the install command shown in the popup (or `./install.sh` from a checkout)
 - Verify the manifest exists:
   - macOS: `cat ~/Library/Application\ Support/Mozilla/NativeMessagingHosts/shiftr_host.json`
   - Linux: `cat ~/.mozilla/native-messaging-hosts/shiftr_host.json`
@@ -224,7 +247,8 @@ shiftr/
 ├── native-host/
 │   ├── shiftr_host.py         # Native messaging host (reads/writes profiles.ini)
 │   └── shiftr_host.json       # Manifest template (install.sh generates the real one)
-├── install.sh                 # Registers native messaging host with Firefox
+├── install.sh                 # Registers native messaging host with Firefox (from a checkout or via curl | bash)
+├── uninstall.sh               # Removes the native messaging host
 ├── LICENSE                    # MIT License
 └── README.md
 ```

@@ -1,7 +1,7 @@
 {
   "manifest_version": 2,
   "name": "Shiftr",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "Profile switcher for Firefox — switch, create, rename, and manage profiles with a click or shortcut.",
   "icons": {
     "48": "icons/icon-ext-48.svg",

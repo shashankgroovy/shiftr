@@ -22,6 +22,16 @@
     <div class="loading">Loading profiles...</div>
   </div>
   <div id="empty-state" class="empty-state" hidden></div>
+  <div id="setup" class="setup" hidden>
+    <div class="setup-title">One-time setup</div>
+    <p id="setup-text" class="setup-text"></p>
+    <div id="setup-actions">
+      <code id="setup-command" class="setup-command"></code>
+      <button id="setup-copy" class="create-submit setup-btn">Copy command</button>
+      <button id="setup-retry" class="create-cancel setup-btn">I've run it — check again</button>
+    </div>
+    <p id="setup-detail" class="setup-detail" hidden></p>
+  </div>
   <div id="create-section" class="create-section">
     <button id="create-btn" class="create-btn">+ New Profile</button>
     <div id="create-form" class="create-form" hidden>

@@ -319,6 +319,53 @@ body {
   text-align: center;
 }
 
+.setup {
+  padding: 14px 16px;
+}
+
+.setup-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-heading);
+  margin-bottom: 6px;
+}
+
+.setup-text {
+  font-size: 12px;
+  line-height: 1.45;
+  color: var(--text-muted);
+}
+
+.setup-command {
+  display: block;
+  margin-top: 10px;
+  padding: 8px 10px;
+  background: var(--input-bg);
+  border: 1px solid var(--input-border);
+  border-radius: 6px;
+  color: var(--text-heading);
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 11px;
+  line-height: 1.45;
+  overflow-wrap: anywhere;
+  user-select: all;
+}
+
+.setup-btn {
+  display: block;
+  width: 100%;
+  margin-top: 8px;
+  padding: 8px;
+}
+
+.setup-detail {
+  margin-top: 10px;
+  font-size: 11px;
+  line-height: 1.4;
+  color: var(--error);
+  overflow-wrap: anywhere;
+}
+
 .create-section {
   border-top: 1px solid var(--border);
   padding: 10px 16px;

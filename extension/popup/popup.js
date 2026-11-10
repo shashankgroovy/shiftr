@@ -1,5 +1,13 @@
 const NATIVE_HOST = "shiftr_host";
 
+// Extensions can't install a native messaging host themselves, so the user
+// runs this once in a terminal. Pinned to this extension version's release tag
+// so the installed host always matches the extension.
+const INSTALL_COMMAND =
+  "curl -fsSL https://raw.githubusercontent.com/shashankgroovy/shiftr/v" +
+  browser.runtime.getManifest().version +
+  "/install.sh | bash";
+
 const THEMES = [
   "ayu-dark", "ayu-mirage", "ayu-light",
   "tokyo-night", "tokyo-storm", "tokyo-light"
@@ -18,11 +26,19 @@ const THEME_LABELS = {
 const errorEl = document.getElementById("error");
 const profileList = document.getElementById("profile-list");
 const emptyState = document.getElementById("empty-state");
+const createSection = document.getElementById("create-section");
 const createBtn = document.getElementById("create-btn");
 const createForm = document.getElementById("create-form");
 const createInput = document.getElementById("create-input");
 const createSubmit = document.getElementById("create-submit");
 const createCancel = document.getElementById("create-cancel");
+const setupEl = document.getElementById("setup");
+const setupText = document.getElementById("setup-text");
+const setupActions = document.getElementById("setup-actions");
+const setupCommand = document.getElementById("setup-command");
+const setupCopy = document.getElementById("setup-copy");
+const setupRetry = document.getElementById("setup-retry");
+const setupDetail = document.getElementById("setup-detail");
 
 // Cached profile data for re-renders without native host round-trip
 let cachedProfiles = null;
@@ -71,17 +87,81 @@ async function loadProfiles() {
 
     if (response.error) {
       showError(response.error);
-      return;
+      return false;
     }
 
+    setupEl.hidden = true;
+    createSection.hidden = false;
     cachedProfiles = response.profiles;
     cachedCurrentProfile = response.current_profile;
     renderProfiles(cachedProfiles, cachedCurrentProfile);
+    return true;
   } catch (err) {
-    showError(
-      "Cannot connect to native host. Run the install script first. (" + err.message + ")"
-    );
+    await showSetup(err);
   }
+  return false;
+}
+
+// Shown when the native host can't be reached (i.e. it isn't installed yet).
+async function showSetup(err) {
+  clearError();
+  profileList.hidden = true;
+  emptyState.hidden = true;
+  createSection.hidden = true;
+
+  let os = "";
+  try {
+    os = (await browser.runtime.getPlatformInfo()).os;
+  } catch (_) {
+    // fall through and show the generic instructions
+  }
+
+  if (os === "win") {
+    setupText.textContent =
+      "Shiftr needs a small helper app to read your Firefox profiles, " +
+      "and it isn't available for Windows yet. macOS and Linux are supported.";
+    setupActions.hidden = true;
+  } else {
+    setupText.textContent =
+      "Shiftr needs a small helper to read and launch your Firefox profiles. " +
+      "Firefox doesn't let extensions install it for you, so run this once in a terminal:";
+    setupCommand.textContent = INSTALL_COMMAND;
+    setupActions.hidden = false;
+  }
+
+  // "No such native application" just means not installed; anything else is
+  // worth surfacing (e.g. the helper is installed but Python 3 is missing).
+  const message = (err && err.message) || "";
+  if (message && !/no such native application/i.test(message)) {
+    setupDetail.textContent = "Firefox reported: " + message;
+    setupDetail.hidden = false;
+  } else {
+    setupDetail.hidden = true;
+  }
+
+  setupEl.hidden = false;
+}
+
+async function copyInstallCommand() {
+  try {
+    await navigator.clipboard.writeText(INSTALL_COMMAND);
+    setupCopy.textContent = "Copied — paste it in a terminal";
+  } catch (_) {
+    // Clipboard unavailable: select the command so it can be copied manually
+    window.getSelection().selectAllChildren(setupCommand);
+    setupCopy.textContent = "Press Ctrl/Cmd+C to copy";
+  }
+  setTimeout(() => {
+    setupCopy.textContent = "Copy command";
+  }, 2500);
+}
+
+async function retrySetup() {
+  setupRetry.disabled = true;
+  setupRetry.textContent = "Checking...";
+  const ok = await loadProfiles();
+  setupRetry.disabled = false;
+  setupRetry.textContent = ok ? "I've run it — check again" : "Not found yet — check again";
 }
 
 function renderProfiles(profiles, currentProfile) {
@@ -348,6 +428,8 @@ async function submitCreateProfile() {
   }
 }
 
+setupCopy.addEventListener("click", copyInstallCommand);
+setupRetry.addEventListener("click", retrySetup);
 createBtn.addEventListener("click", showCreateForm);
 createCancel.addEventListener("click", hideCreateForm);
 createSubmit.addEventListener("click", submitCreateProfile);
